@@ -36,6 +36,35 @@ class PodcastRemoteDatasource {
     return podcastListResponse.data.data.data;
   }
 
+  /// Fetches paginated list of top Jolly podcasts
+  Future<Map<String, dynamic>> getTopJollyPodcastsPaginated({int page = 1}) async {
+    final response = await _dioClient.get<Map<String, dynamic>>(
+      ApiConstants.topJollyPodcasts,
+      queryParameters: {'page': page},
+    );
+
+    if (response.data == null) {
+      return {
+        'podcasts': <PodcastDto>[],
+        'nextPageUrl': null,
+      };
+    }
+
+    _logger.debug('Response data: ${response.data}', 'PODCAST');
+
+    final podcastListResponse = PodcastListResponseDto.fromJson(response.data!);
+    final podcasts = podcastListResponse.data.data.data;
+
+    // Extract next_page_url from pagination data
+    final paginationData = response.data!['data']['data'] as Map<String, dynamic>;
+    final nextPageUrl = paginationData['next_page_url'] as String?;
+
+    return {
+      'podcasts': podcasts,
+      'nextPageUrl': nextPageUrl,
+    };
+  }
+
   /// Fetches details of a specific podcast
   Future<PodcastDto> getPodcastDetails(String podcastId) async {
     try {

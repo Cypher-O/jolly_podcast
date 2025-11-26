@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:jolly_podcast/core/security/secure_storage_service.dart';
 import 'package:jolly_podcast/core/utils/logger_service.dart';
+import 'package:jolly_podcast/presentation/views/login/login_view.dart';
 
 /// {@template api_interceptor}
 /// Dio interceptor that adds authentication token to requests.
@@ -65,8 +67,44 @@ class ApiInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     _logger.logNetworkError(err.requestOptions.path, err);
+
+    // Handle 401 Unauthorized errors
+    if (err.response?.statusCode == 401) {
+      // Clear the stored token
+      await _secureStorage.deleteToken();
+
+      // Navigate to login screen using the global navigator key
+      // Import the navigatorKey from app.dart
+      final navigator = _getNavigator();
+      if (navigator != null) {
+        // Navigate to login and clear the navigation stack
+        navigator.pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => const LoginView(),
+          ),
+          (route) => false,
+        );
+      }
+    }
+
     handler.next(err);
+  }
+
+  /// Gets the navigator state from the global key
+  NavigatorState? _getNavigator() {
+    try {
+      // We need to import this from app.dart
+      // Using a workaround to avoid circular dependency
+      return WidgetsBinding.instance.rootElement
+          ?.findAncestorStateOfType<NavigatorState>();
+    } catch (e) {
+      _logger.debug('Failed to get navigator: $e', 'API_INTERCEPTOR');
+      return null;
+    }
   }
 }

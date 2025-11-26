@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jolly_podcast/core/config/app_config.dart';
@@ -5,6 +6,10 @@ import 'package:jolly_podcast/core/constants/app_colors.dart';
 import 'package:jolly_podcast/presentation/viewmodels/login_viewmodel.dart';
 import 'package:jolly_podcast/presentation/views/login/login_view.dart';
 import 'package:jolly_podcast/presentation/views/podcast_list/podcast_list_view.dart';
+import 'package:jolly_podcast/presentation/views/splash/splash_view.dart';
+
+/// Global navigation key for navigating without BuildContext
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 /// {@template jolly_podcast_app}
 /// Main application widget for Jolly Podcast.
@@ -23,6 +28,7 @@ class JollyPodcastApp extends ConsumerWidget {
     final appConfig = AppConfig.instance;
 
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: appConfig.appName,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -51,8 +57,42 @@ class JollyPodcastApp extends ConsumerWidget {
         useMaterial3: true,
         fontFamily: 'System',
       ),
-      home: const AuthenticationWrapper(),
+      home: const SplashWrapper(),
     );
+  }
+}
+
+/// {@template splash_wrapper}
+/// Wrapper that shows splash screen then navigates to authentication check.
+/// {@endtemplate}
+class SplashWrapper extends StatefulWidget {
+  const SplashWrapper({super.key});
+
+  @override
+  State<SplashWrapper> createState() => _SplashWrapperState();
+}
+
+class _SplashWrapperState extends State<SplashWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    _navigateToAuth();
+  }
+
+  Future<void> _navigateToAuth() async {
+    await Future.delayed(const Duration(seconds: 3));
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const AuthenticationWrapper(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const SplashView();
   }
 }
 

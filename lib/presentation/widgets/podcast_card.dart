@@ -27,99 +27,138 @@ class PodcastCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: AppDimensions.cardElevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surfaceDark,
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(AppDimensions.radiusLarge),
-              ),
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: podcast.imageUrl.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: podcast.imageUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          color: AppColors.border,
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: AppDimensions.borderThick,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                AppColors.primary,
-                              ),
+            // Podcast Thumbnail Image - full width, no padding
+            AspectRatio(
+              aspectRatio: 1,
+              child: podcast.imageUrl.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: podcast.imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: AppColors.surfaceDark,
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color(0xFF10B981),
                             ),
                           ),
                         ),
-                        errorWidget: (context, url, error) => Container(
-                          color: AppColors.border,
-                          child: const Icon(
-                            Icons.podcasts,
-                            size: AppDimensions.iconXLarge,
-                            color: AppColors.textTertiary,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        color: AppColors.border,
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: AppColors.surfaceDark,
                         child: const Icon(
                           Icons.podcasts,
-                          size: AppDimensions.iconXLarge,
+                          size: 48,
                           color: AppColors.textTertiary,
                         ),
                       ),
-              ),
+                    )
+                  : Container(
+                      color: AppColors.surfaceDark,
+                      child: const Icon(
+                        Icons.podcasts,
+                        size: 48,
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
             ),
+            // Podcast Info Section
             Padding(
-              padding: const EdgeInsets.all(AppDimensions.spacing12),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Title
                   Text(
                     podcast.title,
-                    style: AppTypography.bodyLarge.copyWith(
-                      fontWeight: AppTypography.weightSemiBold,
-                      color: AppColors.textPrimary,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: AppDimensions.spacing4),
-                  Text(
-                    podcast.author,
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                      fontSize: 12,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (podcast.subscriberCount != null) ...[
-                    const SizedBox(height: AppDimensions.spacing8),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.people_outline,
-                          size: AppDimensions.iconSmall,
-                          color: AppColors.textTertiary,
-                        ),
-                        const SizedBox(width: AppDimensions.spacing4),
-                        Text(
-                          '${podcast.subscriberCount} subscribers',
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.textTertiary,
+                  const SizedBox(height: 2),
+                  // Author - Use publisher name
+                  Text(
+                    podcast.publisherName ?? podcast.author,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 10,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  // Follow button and Share icon row
+                  Row(
+                    children: [
+                      // Follow Button with plus icon - grey background, white content
+                      Expanded(
+                        child: Container(
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF374151),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/images/add.png',
+                                width: 12,
+                                height: 12,
+                                fit: BoxFit.contain,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Follow',
+                                style: AppTypography.caption.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(width: 6),
+                      // Share Icon Button - circular, separate
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF374151),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/images/share.png',
+                            width: 12,
+                            height: 12,
+                            fit: BoxFit.contain,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

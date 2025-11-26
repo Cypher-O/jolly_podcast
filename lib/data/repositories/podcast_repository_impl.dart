@@ -1,4 +1,5 @@
 import 'package:jolly_podcast/data/datasources/podcast_remote_datasource.dart';
+import 'package:jolly_podcast/data/models/podcast_dto.dart';
 import 'package:jolly_podcast/domain/entities/episode.dart';
 import 'package:jolly_podcast/domain/entities/podcast.dart';
 import 'package:jolly_podcast/domain/repositories/podcast_repository.dart';
@@ -27,7 +28,19 @@ class PodcastRepositoryImpl implements PodcastRepository {
   }
 
   @override
-  Future<Podcast> getPodcastDetails(String podcastId) async {
+  Future<Map<String, dynamic>> getTopJollyPodcastsPaginated({int page = 1}) async {
+    final result = await _remoteDatasource.getTopJollyPodcastsPaginated(page: page);
+    final dtos = result['podcasts'] as List<PodcastDto>;
+    final podcasts = dtos.map((dto) => Podcast.fromDto(dto)).toList();
+
+    return {
+      'podcasts': podcasts,
+      'nextPageUrl': result['nextPageUrl'],
+    };
+  }
+
+  @override
+  Future<Podcast> getPodcastDetails(String podcastId) async{
     final dto = await _remoteDatasource.getPodcastDetails(podcastId);
     return Podcast.fromDto(dto);
   }
@@ -36,6 +49,23 @@ class PodcastRepositoryImpl implements PodcastRepository {
   Future<List<Episode>> getPodcastEpisodes(String podcastId) async {
     final dtos = await _remoteDatasource.getPodcastEpisodes(podcastId);
     return dtos.map((dto) => Episode.fromDto(dto)).toList();
+  }
+
+  @override
+  Future<Map<String, dynamic>> getPodcastEpisodesWithPodcastData(String podcastId) async {
+    final dtos = await _remoteDatasource.getPodcastEpisodes(podcastId);
+    final episodes = dtos.map((dto) => Episode.fromDto(dto)).toList();
+
+    // Extract podcast data from first episode if available
+    Podcast? podcast;
+    if (dtos.isNotEmpty && dtos.first.podcast != null) {
+      podcast = Podcast.fromDto(dtos.first.podcast!);
+    }
+
+    return {
+      'episodes': episodes,
+      'podcast': podcast,
+    };
   }
 
   @override

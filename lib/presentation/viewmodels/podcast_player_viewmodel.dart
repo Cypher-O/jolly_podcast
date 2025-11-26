@@ -81,10 +81,13 @@ class PodcastPlayerViewModel extends ChangeNotifier {
       notifyListeners();
     });
 
-    _audioPlayer.onPlayerComplete.listen((_) {
+    _audioPlayer.onPlayerComplete.listen((_) async {
       _isPlaying = false;
       _currentPosition = Duration.zero;
       notifyListeners();
+
+      // Automatically play next episode if available
+      await _playNextEpisodeIfAvailable();
     });
   }
 
@@ -123,13 +126,18 @@ class PodcastPlayerViewModel extends ChangeNotifier {
 
     try {
       final podcastRepository = _ref.read(podcastRepositoryProvider);
-      _episodes = await podcastRepository.getPodcastEpisodes(podcastId);
+
+      // If podcast is null, use the method that extracts podcast data from episodes
+      if (_podcast == null) {
+        final result = await podcastRepository.getPodcastEpisodesWithPodcastData(podcastId);
+        _episodes = result['episodes'] as List<Episode>;
+        _podcast = result['podcast'] as Podcast?;
+      } else {
+        _episodes = await podcastRepository.getPodcastEpisodes(podcastId);
+      }
+
       _isLoadingEpisodes = false;
       notifyListeners();
-
-      if (_episodes.isNotEmpty && _currentEpisode == null) {
-        await selectEpisode(_episodes.first);
-      }
     } on NetworkException catch (e) {
       _isLoadingEpisodes = false;
       _errorMessage = e.message;
@@ -142,7 +150,11 @@ class PodcastPlayerViewModel extends ChangeNotifier {
   }
 
   Future<void> selectEpisode(Episode episode) async {
-    if (_currentEpisode?.id == episode.id) return;
+    if (_currentEpisode?.id == episode.id) {
+      // If same episode, just toggle play/pause
+      await togglePlayPause();
+      return;
+    }
 
     await pause();
     _currentEpisode = episode;
@@ -152,6 +164,8 @@ class PodcastPlayerViewModel extends ChangeNotifier {
 
     if (episode.audioUrl != null && episode.audioUrl!.isNotEmpty) {
       await _loadAudio(episode.audioUrl!);
+      // Automatically start playing after loading
+      await play();
     }
   }
 
@@ -206,6 +220,43 @@ class PodcastPlayerViewModel extends ChangeNotifier {
       _errorMessage = 'Failed to seek.';
       notifyListeners();
     }
+  }
+
+  Future<void> playNextEpisode() async {
+    if (_currentEpisode == null || _episodes.isEmpty) return;
+
+    final currentIndex = _episodes.indexWhere((e) => e.id == _currentEpisode!.id);
+    if (currentIndex == -1 || currentIndex >= _episodes.length - 1) {
+      // Already at last episode, do nothing or loop to first
+      return;
+    }
+
+    await selectEpisode(_episodes[currentIndex + 1]);
+    await play();
+  }
+
+  Future<void> _playNextEpisodeIfAvailable() async {
+    if (_currentEpisode == null || _episodes.isEmpty) return;
+
+    final currentIndex = _episodes.indexWhere((e) => e.id == _currentEpisode!.id);
+    // Only auto-play next if there's another episode after this one
+    if (currentIndex != -1 && currentIndex < _episodes.length - 1) {
+      await selectEpisode(_episodes[currentIndex + 1]);
+    }
+  }
+
+  Future<void> playPreviousEpisode() async {
+    if (_currentEpisode == null || _episodes.isEmpty) return;
+
+    final currentIndex = _episodes.indexWhere((e) => e.id == _currentEpisode!.id);
+    if (currentIndex <= 0) {
+      // Already at first episode, restart current episode
+      await seek(Duration.zero);
+      return;
+    }
+
+    await selectEpisode(_episodes[currentIndex - 1]);
+    await play();
   }
 
   Future<void> _markEpisodePlayed() async {

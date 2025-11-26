@@ -18,6 +18,12 @@ abstract class PodcastRepository {
   /// Throws [NetworkException] on failure.
   Future<List<Podcast>> getTopJollyPodcasts();
 
+  /// Fetches paginated list of top Jolly podcasts
+  ///
+  /// Returns a map with 'podcasts' list and 'nextPageUrl' string.
+  /// Throws [NetworkException] on failure.
+  Future<Map<String, dynamic>> getTopJollyPodcastsPaginated({int page = 1});
+
   /// Fetches details of a specific podcast
   ///
   /// Returns the podcast with the given [podcastId].
@@ -29,6 +35,13 @@ abstract class PodcastRepository {
   /// Returns a list of episodes for the podcast with the given [podcastId].
   /// Throws [NetworkException] on failure.
   Future<List<Episode>> getPodcastEpisodes(String podcastId);
+
+  /// Fetches episodes with podcast data for a specific podcast
+  ///
+  /// Returns a map containing 'episodes' list and 'podcast' data extracted from episodes.
+  /// This is useful as a fallback when podcast details endpoint fails.
+  /// Throws [NetworkException] on failure.
+  Future<Map<String, dynamic>> getPodcastEpisodesWithPodcastData(String podcastId);
 
   /// Fetches details of a specific episode
   ///
