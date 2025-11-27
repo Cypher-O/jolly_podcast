@@ -125,7 +125,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
                         letterSpacing: 1.2,
                         textAlign: TextAlign.center,
                       ),
-                      // const Spacer(flex: 1),
                       const SizedBox(height: AppDimensions.spacing32),
                       // Phone input
                       Container(

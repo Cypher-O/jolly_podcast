@@ -15,8 +15,8 @@ A Flutter podcast application built for Bloocode Technology recruitment assessme
 ### Prerequisites
 
 - Flutter SDK (>=3.3.3 <4.0.0)
-- Android Studio / Xcode
-- An emulator or physical device
+- VS code / Android Studio / Xcode
+- An simulator/emulator or physical device
 
 ### Installation Steps
 
@@ -103,13 +103,11 @@ View → ViewModel → Repository → DataSource → API
   - Implemented fallback: extract podcast data from episodes response
 - Subscriber count may not be in podcast details response
   - Implemented: preserve count from list view
-- Audio URLs are publicly accessible (no auth required for streaming)
 - Bearer token authentication
 - No token refresh mechanism needed (token valid until logout)
 
 ### UI/UX Decisions
 
-- Phone number sent as-is without formatting (Nigerian format: 080xxxxxxxx)
 - Grid layout (2 columns) for better visual hierarchy on podcast list
 - Auto-play when selecting a new episode (better UX)
 - Auto-advance to next episode when current completes (continuous listening)
@@ -224,4 +222,3 @@ View → ViewModel → Repository → DataSource → API
 - `build_runner` - Code generation
 - `json_serializable` - JSON serialization
 - `riverpod_generator` - Riverpod code generation
-

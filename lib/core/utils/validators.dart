@@ -13,7 +13,7 @@ import 'package:jolly_podcast/core/constants/app_strings.dart';
 class Validators {
   Validators._();
 
-  /// Validates Nigerian phone numbers
+  /// Validates phone numbers
   /// Accepts formats: 08012345678, 2348012345678, +2348012345678
   static String? validatePhoneNumber(String? value) {
     if (value == null || value.isEmpty) {
@@ -23,7 +23,7 @@ class Validators {
     // Remove spaces and special characters
     final cleanNumber = value.replaceAll(RegExp(r'[\s\-\(\)]'), '');
 
-    // Nigerian phone number patterns
+    // phone number patterns
     final patterns = [
       RegExp(r'^0[7-9][0-1]\d{8}$'), // 08012345678
       RegExp(r'^234[7-9][0-1]\d{8}$'), // 2348012345678
@@ -61,7 +61,7 @@ class Validators {
     return null;
   }
 
-  /// Normalizes Nigerian phone number to API format (without +)
+  /// Normalizes phone number to API format (without +)
   /// Converts any format to: 2348012345678
   static String normalizePhoneNumber(String phoneNumber) {
     // Remove all non-digit characters

@@ -68,8 +68,4 @@ void _handleError(Object error, StackTrace? stack) {
     debugPrint('Stack trace: $stack');
     debugPrint('===================');
   }
-
-  // In production, you would send this to a crash reporting service
-  // like Sentry, Firebase Crashlytics, etc.
-  // Example: Sentry.captureException(error, stackTrace: stack);
 }

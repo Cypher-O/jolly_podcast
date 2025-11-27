@@ -322,15 +322,6 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
                                     onPressed: viewModel.isLoadingMore
                                         ? null
                                         : () => viewModel.loadMore(),
-                                    // style: OutlinedButton.styleFrom(
-                                    //   side: const BorderSide(
-                                    //     color: AppColors.border,
-                                    //   ),
-                                    //   shape: RoundedRectangleBorder(
-                                    //     borderRadius: BorderRadius.circular(
-                                    //         AppDimensions.radiusSmall),
-                                    //   ),
-                                    // ),
                                     child: viewModel.isLoadingMore
                                         ? const SizedBox(
                                             width: AppDimensions
