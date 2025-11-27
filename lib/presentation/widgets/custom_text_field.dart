@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:jolly_podcast/core/constants/app_colors.dart';
 import 'package:jolly_podcast/core/constants/app_dimensions.dart';
 import 'package:jolly_podcast/core/constants/app_typography.dart';
+import 'package:jolly_podcast/presentation/widgets/app_text.dart';
 
 /// {@template custom_text_field}
 /// A customizable text input field widget.
@@ -56,7 +57,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (widget.label != null) ...[
-          Text(
+          AppText(
             widget.label!,
             style: AppTypography.labelMedium,
           ),

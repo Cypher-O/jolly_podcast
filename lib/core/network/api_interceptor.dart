@@ -1,24 +1,29 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:jolly_podcast/core/security/secure_storage_service.dart';
+import 'package:jolly_podcast/core/services/authentication_service.dart';
 import 'package:jolly_podcast/core/utils/logger_service.dart';
-import 'package:jolly_podcast/presentation/views/login/login_view.dart';
 
 /// {@template api_interceptor}
 /// Dio interceptor that adds authentication token to requests.
 ///
-/// Single Responsibility: Manages request/response interception
-/// for authentication and delegates logging to LoggerService.
+/// Single Responsibility: Manages HTTP request/response interception,
+/// adds authentication headers, and delegates auth state changes
+/// to AuthenticationService.
 /// {@endtemplate}
 ///
 /// **Implementation Note:** Custom implementation for Jolly Podcast Assessment
 /// **Date:** 2025-11-24
 /// **Purpose:** Bloocode Technology Recruitment
 class ApiInterceptor extends Interceptor {
-  ApiInterceptor(this._secureStorage, this._logger);
+  ApiInterceptor(
+    this._secureStorage,
+    this._logger,
+    this._authenticationService,
+  );
 
   final SecureStorageService _secureStorage;
   final LoggerService _logger;
+  final AuthenticationService _authenticationService;
 
   @override
   Future<void> onRequest(
@@ -44,14 +49,35 @@ class ApiInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  Future<void> onResponse(
+    Response response,
+    ResponseInterceptorHandler handler,
+  ) async {
     _logger.logResponse(
       response.statusCode,
       response.requestOptions.path,
     );
 
-    // Check for error status codes and reject them
+    // Handle 401 Unauthorized specifically
     final statusCode = response.statusCode;
+    if (statusCode == 401) {
+      _logger.info('401 Unauthorized detected', 'API_INTERCEPTOR');
+
+      // Delegate session expiration handling to AuthenticationService
+      await _authenticationService.handleSessionExpired();
+
+      // Reject the response to trigger error handling in the app
+      handler.reject(
+        DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          type: DioExceptionType.badResponse,
+        ),
+      );
+      return;
+    }
+
+    // Check for other error status codes and reject them
     if (statusCode != null && (statusCode < 200 || statusCode >= 300)) {
       handler.reject(
         DioException(
@@ -73,38 +99,12 @@ class ApiInterceptor extends Interceptor {
   ) async {
     _logger.logNetworkError(err.requestOptions.path, err);
 
-    // Handle 401 Unauthorized errors
+    // Handle 401 Unauthorized errors (fallback, should be handled in onResponse)
     if (err.response?.statusCode == 401) {
-      // Clear the stored token
-      await _secureStorage.deleteToken();
-
-      // Navigate to login screen using the global navigator key
-      // Import the navigatorKey from app.dart
-      final navigator = _getNavigator();
-      if (navigator != null) {
-        // Navigate to login and clear the navigation stack
-        navigator.pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => const LoginView(),
-          ),
-          (route) => false,
-        );
-      }
+      _logger.info('401 Unauthorized detected in onError', 'API_INTERCEPTOR');
+      await _authenticationService.handleSessionExpired();
     }
 
     handler.next(err);
-  }
-
-  /// Gets the navigator state from the global key
-  NavigatorState? _getNavigator() {
-    try {
-      // We need to import this from app.dart
-      // Using a workaround to avoid circular dependency
-      return WidgetsBinding.instance.rootElement
-          ?.findAncestorStateOfType<NavigatorState>();
-    } catch (e) {
-      _logger.debug('Failed to get navigator: $e', 'API_INTERCEPTOR');
-      return null;
-    }
   }
 }

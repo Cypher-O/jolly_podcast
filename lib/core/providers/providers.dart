@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jolly_podcast/core/network/dio_client.dart';
 import 'package:jolly_podcast/core/security/secure_storage_service.dart';
+import 'package:jolly_podcast/core/services/authentication_service.dart';
 import 'package:jolly_podcast/core/utils/logger_service.dart';
 import 'package:jolly_podcast/data/datasources/auth_remote_datasource.dart';
 import 'package:jolly_podcast/data/datasources/podcast_remote_datasource.dart';
@@ -42,11 +43,20 @@ final secureStorageServiceProvider = Provider<SecureStorageService>((ref) {
   return SecureStorageService(ref.watch(secureStorageProvider));
 });
 
+/// Provider for AuthenticationService
+final authenticationServiceProvider = Provider<AuthenticationService>((ref) {
+  return AuthenticationService(
+    ref.watch(secureStorageServiceProvider),
+    ref.watch(loggerServiceProvider),
+  );
+});
+
 /// Provider for DioClient
 final dioClientProvider = Provider<DioClient>((ref) {
   return DioClient(
     ref.watch(secureStorageServiceProvider),
     ref.watch(loggerServiceProvider),
+    ref.watch(authenticationServiceProvider),
   );
 });
 

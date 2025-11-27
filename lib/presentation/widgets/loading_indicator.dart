@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jolly_podcast/core/constants/app_colors.dart';
 import 'package:jolly_podcast/core/constants/app_dimensions.dart';
 import 'package:jolly_podcast/core/constants/app_typography.dart';
+import 'package:jolly_podcast/presentation/widgets/app_text.dart';
 
 /// {@template loading_indicator}
 /// A consistent loading indicator widget used throughout the application.
@@ -38,7 +39,7 @@ class LoadingIndicator extends StatelessWidget {
           ),
           if (message != null) ...[
             const SizedBox(height: AppDimensions.spacing16),
-            Text(
+            AppText(
               message!,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.textSecondary,

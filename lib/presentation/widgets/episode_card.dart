@@ -1,9 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:jolly_podcast/core/constants/app_assets.dart';
 import 'package:jolly_podcast/core/constants/app_colors.dart';
 import 'package:jolly_podcast/core/constants/app_dimensions.dart';
 import 'package:jolly_podcast/core/constants/app_typography.dart';
 import 'package:jolly_podcast/domain/entities/episode.dart';
+import 'package:jolly_podcast/presentation/widgets/app_text.dart';
+import 'package:jolly_podcast/presentation/widgets/episode_menu_sheet.dart';
 
 /// {@template episode_card}
 /// A card widget that displays episode information.
@@ -31,16 +34,11 @@ class EpisodeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-      ),
-      child: InkWell(
+    return SizedBox(
+      child: GestureDetector(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
         child: Padding(
-          padding: const EdgeInsets.all(AppDimensions.spacing12),
+          padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing8),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -48,10 +46,11 @@ class EpisodeCard extends StatelessWidget {
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.radiusSmall),
                     child: SizedBox(
-                      width: 80,
-                      height: 80,
+                      width: AppDimensions.imageSmall,
+                      height: AppDimensions.imageSmall,
                       child: episode.imageUrl != null
                           ? CachedNetworkImage(
                               imageUrl: episode.imageUrl!,
@@ -89,20 +88,13 @@ class EpisodeCard extends StatelessWidget {
                   // Play/Pause icon overlay on thumbnail
                   Positioned.fill(
                     child: Center(
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        // decoration: BoxDecoration(
-                        //   color: AppColors.primary.withOpacity(0.9),
-                        //   shape: BoxShape.circle,
-                        // ),
+                      child: SizedBox(
+                        width: AppDimensions.playPauseOverlaySize,
+                        height: AppDimensions.playPauseOverlaySize,
                         child: Image.asset(
-                          isPlaying
-                              ? 'assets/images/pause.png'
-                              : 'assets/images/play.png',
-                          width: 20,
-                          height: 20,
-                          // color: AppColors.textOnPrimary,
+                          isPlaying ? AppAssets.pauseIcon : AppAssets.playIcon,
+                          width: AppDimensions.playPauseIconSize,
+                          height: AppDimensions.playPauseIconSize,
                         ),
                       ),
                     ),
@@ -116,11 +108,12 @@ class EpisodeCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Title
-                    Text(
+                    AppText(
                       episode.title,
                       style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,
+                        fontSize: AppTypography.fontSize16 - 1,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -128,11 +121,12 @@ class EpisodeCard extends StatelessWidget {
                     const SizedBox(height: AppDimensions.spacing4),
                     // Description
                     if (episode.description != null)
-                      Text(
+                      AppText(
                         episode.description!,
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: 11,
+                          color: AppColors.textEpisodeCard,
+                          fontSize: AppDimensions.fontMedium13,
+                          fontWeight: FontWeight.w500,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -142,32 +136,33 @@ class EpisodeCard extends StatelessWidget {
                     Row(
                       children: [
                         if (episode.publishedAt != null) ...[
-                          Text(
-                            _formatDate(episode.publishedAt!),
+                          AppText(
+                            episode.formattedPublishedDate,
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.textSecondary,
-                              fontSize: 10,
+                              color: AppColors.textGreyLight,
+                              fontSize: AppTypography.fontSize12,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ],
-                        if (episode.duration != null && episode.publishedAt != null) ...[
-                          const SizedBox(width: AppDimensions.spacing8),
-                          Container(
-                            width: 3,
-                            height: 3,
-                            decoration: const BoxDecoration(
-                              color: AppColors.textSecondary,
-                              shape: BoxShape.circle,
+                        if (episode.duration != null &&
+                            episode.publishedAt != null) ...[
+                          AppText(
+                            ', ',
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.textGreyLight,
+                              fontSize: AppTypography.fontSize12,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const SizedBox(width: AppDimensions.spacing8),
                         ],
                         if (episode.duration != null) ...[
-                          Text(
+                          AppText(
                             episode.formattedDuration,
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.textSecondary,
-                              fontSize: 10,
+                              color: AppColors.textGreyLight,
+                              fontSize: AppTypography.fontSize12,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ],
@@ -183,7 +178,7 @@ class EpisodeCard extends StatelessWidget {
                 child: const Icon(
                   Icons.more_vert,
                   color: AppColors.textSecondary,
-                  size: 24,
+                  size: AppDimensions.iconMedium,
                 ),
               ),
             ],
@@ -202,200 +197,7 @@ class EpisodeCard extends StatelessWidget {
           top: Radius.circular(AppDimensions.radiusLarge),
         ),
       ),
-      builder: (context) => _EpisodeMenuSheet(episode: episode),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays == 0) {
-      return 'Today';
-    } else if (difference.inDays == 1) {
-      return 'Yesterday';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
-    } else if (difference.inDays < 30) {
-      final weeks = (difference.inDays / 7).floor();
-      return '$weeks ${weeks == 1 ? 'week' : 'weeks'} ago';
-    } else if (difference.inDays < 365) {
-      final months = (difference.inDays / 30).floor();
-      return '$months ${months == 1 ? 'month' : 'months'} ago';
-    } else {
-      final years = (difference.inDays / 365).floor();
-      return '$years ${years == 1 ? 'year' : 'years'} ago';
-    }
-  }
-}
-
-/// Bottom sheet menu for episode actions
-class _EpisodeMenuSheet extends StatelessWidget {
-  const _EpisodeMenuSheet({required this.episode});
-
-  final Episode episode;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: AppDimensions.spacing24,
-        horizontal: AppDimensions.spacing16,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Episode header
-          Row(
-            children: [
-              // Episode thumbnail
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
-                child: SizedBox(
-                  width: 80,
-                  height: 80,
-                  child: episode.imageUrl != null
-                      ? CachedNetworkImage(
-                          imageUrl: episode.imageUrl!,
-                          fit: BoxFit.cover,
-                          errorWidget: (context, url, error) => Container(
-                            color: AppColors.surfaceDark,
-                            child: const Icon(
-                              Icons.music_note,
-                              size: 40,
-                              color: AppColors.textTertiary,
-                            ),
-                          ),
-                        )
-                      : Container(
-                          color: AppColors.surfaceDark,
-                          child: const Icon(
-                            Icons.music_note,
-                            size: 40,
-                            color: AppColors.textTertiary,
-                          ),
-                        ),
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacing12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      episode.title,
-                      style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: AppDimensions.spacing4),
-                    if (episode.description != null)
-                      Text(
-                        episode.description!,
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppDimensions.spacing24),
-          // Menu options
-          _MenuOption(
-            icon: Icons.play_circle_outline,
-            label: 'Play',
-            onTap: () {
-              Navigator.pop(context);
-              // Play episode
-            },
-          ),
-          _MenuOption(
-            icon: Icons.favorite,
-            iconColor: AppColors.primary,
-            label: 'Remove from favorite',
-            onTap: () {
-              Navigator.pop(context);
-              // Remove from favorites
-            },
-          ),
-          _MenuOption(
-            icon: Icons.playlist_add,
-            label: 'Add to queue',
-            onTap: () {
-              Navigator.pop(context);
-              // Add to queue
-            },
-          ),
-          _MenuOption(
-            icon: Icons.share,
-            label: 'Share episode',
-            onTap: () {
-              Navigator.pop(context);
-              // Share episode
-            },
-          ),
-          _MenuOption(
-            icon: Icons.remove_circle_outline,
-            label: 'Remove from playlist',
-            onTap: () {
-              Navigator.pop(context);
-              // Remove from playlist
-            },
-          ),
-          const SizedBox(height: AppDimensions.spacing8),
-        ],
-      ),
-    );
-  }
-}
-
-/// Menu option item
-class _MenuOption extends StatelessWidget {
-  const _MenuOption({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.iconColor,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final Color? iconColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: AppDimensions.spacing12,
-          horizontal: AppDimensions.spacing8,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: iconColor ?? AppColors.textPrimary,
-              size: 24,
-            ),
-            const SizedBox(width: AppDimensions.spacing16),
-            Text(
-              label,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ],
-        ),
-      ),
+      builder: (context) => EpisodeMenuSheet(episode: episode),
     );
   }
 }

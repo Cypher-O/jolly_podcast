@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jolly_podcast/core/constants/app_assets.dart';
 
 /// {@template splash_view}
 /// Splash screen for the Jolly Podcast application.
@@ -24,7 +25,7 @@ class SplashView extends StatelessWidget {
           // Background image - Full screen
           Positioned.fill(
             child: Image.asset(
-              'assets/images/splash_bg.png',
+              AppAssets.splashBackground,
               fit: BoxFit.cover,
               alignment: Alignment.center,
             ),
@@ -36,7 +37,7 @@ class SplashView extends StatelessWidget {
             right: 0,
             child: Center(
               child: Image.asset(
-                'assets/images/jolly_logo.png',
+                AppAssets.jollyLogo,
                 width: screenWidth * 0.6,
                 fit: BoxFit.contain,
               ),

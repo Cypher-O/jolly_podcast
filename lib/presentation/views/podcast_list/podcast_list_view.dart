@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jolly_podcast/core/constants/app_assets.dart';
 import 'package:jolly_podcast/core/constants/app_colors.dart';
 import 'package:jolly_podcast/core/constants/app_dimensions.dart';
 import 'package:jolly_podcast/core/constants/app_strings.dart';
@@ -7,6 +8,7 @@ import 'package:jolly_podcast/core/constants/app_typography.dart';
 import 'package:jolly_podcast/presentation/viewmodels/podcast_list_viewmodel.dart';
 import 'package:jolly_podcast/presentation/views/login/login_view.dart';
 import 'package:jolly_podcast/presentation/views/podcast_player/podcast_player_view.dart';
+import 'package:jolly_podcast/presentation/widgets/app_text.dart';
 import 'package:jolly_podcast/presentation/widgets/loading_indicator.dart';
 import 'package:jolly_podcast/presentation/widgets/podcast_card.dart';
 
@@ -33,11 +35,11 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(
+        title: AppText(
           AppStrings.logout,
           style: AppTypography.h3.copyWith(color: AppColors.textPrimary),
         ),
-        content: Text(
+        content: AppText(
           AppStrings.logoutConfirmation,
           style:
               AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
@@ -45,14 +47,14 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(
+            child: const AppText(
               AppStrings.cancel,
               style: TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
+            child: const AppText(
               AppStrings.confirm,
               style: TextStyle(color: AppColors.error),
             ),
@@ -77,7 +79,9 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      extendBodyBehindAppBar: true,
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             // Custom Top Bar
@@ -87,48 +91,49 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
                 children: [
                   // Jolly Logo (using image)
                   Image.asset(
-                    'assets/images/jolly_logo_login.png',
-                    height: 32,
+                    AppAssets.jollyLogoLogin,
+                    height: AppDimensions.iconLarge,
                     fit: BoxFit.contain,
                   ),
                   const Spacer(),
                   // Icons Container - all three icons in one rounded container
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 6,
+                      horizontal: AppDimensions.spacing8,
+                      vertical: AppDimensions.buttonPaddingVertical6,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusButton),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Bell/Notification Icon
                         Image.asset(
-                          'assets/images/notification.png',
-                          width: 24,
-                          height: 24,
+                          AppAssets.notificationIcon,
+                          width: AppDimensions.iconMedium,
+                          height: AppDimensions.iconMedium,
                           fit: BoxFit.contain,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppDimensions.spacing12),
                         // User Avatar
                         InkWell(
                           onTap: _handleLogout,
                           child: Image.asset(
-                            'assets/images/user.png',
-                            width: 24,
-                            height: 24,
+                            AppAssets.userIcon,
+                            width: AppDimensions.iconMedium,
+                            height: AppDimensions.iconMedium,
                             fit: BoxFit.contain,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppDimensions.spacing12),
                         // Search Icon
                         Image.asset(
-                          'assets/images/search.png',
-                          width: 24,
-                          height: 24,
+                          AppAssets.searchIcon,
+                          width: AppDimensions.iconMedium,
+                          height: AppDimensions.iconMedium,
                           fit: BoxFit.contain,
                         ),
                       ],
@@ -149,18 +154,21 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Top Jolly',
+                    AppText(
+                      AppStrings.topJolly,
                       style: AppTypography.h2.copyWith(
                         color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
+                        fontSize: AppTypography.fontSize20,
                       ),
                     ),
                     const SizedBox(height: AppDimensions.spacing4),
-                    Text(
-                      'Top Jolly podcasts',
+                    AppText(
+                      AppStrings.topJollyPodcasts,
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: AppTypography.fontSize14,
                       ),
                     ),
                   ],
@@ -174,7 +182,7 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
                 horizontal: AppDimensions.spacing16,
               ),
               child: Container(
-                height: 1,
+                height: AppDimensions.separatorHeight,
                 color: AppColors.border,
               ),
             ),
@@ -187,23 +195,25 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
               child: Row(
                 children: [
                   Image.asset(
-                    'assets/images/more.png',
-                    width: 16,
-                    height: 16,
+                    AppAssets.moreIcon,
+                    width: AppDimensions.iconSmall,
+                    height: AppDimensions.iconSmall,
                     fit: BoxFit.contain,
                   ),
                   const SizedBox(width: AppDimensions.spacing8),
-                  Text(
-                    'Sort by: Ascending',
+                  AppText(
+                    AppStrings.sortBy,
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: AppTypography.fontSize14,
                     ),
                   ),
                   const SizedBox(width: AppDimensions.spacing4),
                   Image.asset(
-                    'assets/images/chevron_down.png',
-                    width: 16,
-                    height: 16,
+                    AppAssets.chevronDown,
+                    width: AppDimensions.iconTiny,
+                    height: AppDimensions.iconTiny,
                     fit: BoxFit.contain,
                   ),
                 ],
@@ -231,8 +241,9 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
                             color: AppColors.error,
                           ),
                           const SizedBox(height: AppDimensions.spacing16),
-                          Text(
-                            viewModel.errorMessage ?? 'An error occurred',
+                          AppText(
+                            viewModel.errorMessage ??
+                                AppStrings.anErrorOccurred,
                             style: AppTypography.bodyLarge.copyWith(
                               color: AppColors.textPrimary,
                             ),
@@ -244,8 +255,8 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
 
                   if (viewModel.isEmpty) {
                     return Center(
-                      child: Text(
-                        'No podcasts available',
+                      child: AppText(
+                        AppStrings.noPodcastsAvailable,
                         style: AppTypography.bodyLarge.copyWith(
                           color: AppColors.textSecondary,
                         ),
@@ -268,7 +279,7 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              childAspectRatio: 0.65,
+                              childAspectRatio: 0.62,
                               crossAxisSpacing: AppDimensions.spacing12,
                               mainAxisSpacing: AppDimensions.spacing16,
                             ),
@@ -282,6 +293,7 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
                                       MaterialPageRoute(
                                         builder: (_) => PodcastPlayerView(
                                           podcastId: podcast.id.toString(),
+                                          podcast: podcast,
                                         ),
                                       ),
                                     );
@@ -296,39 +308,52 @@ class _PodcastListViewState extends ConsumerState<PodcastListView> {
                         if (viewModel.hasMore)
                           SliverToBoxAdapter(
                             child: Padding(
-                              padding: const EdgeInsets.all(16),
+                              padding:
+                                  const EdgeInsets.all(AppDimensions.spacing16),
                               child: Center(
-                                child: SizedBox(
-                                  width: 200,
-                                  height: 44,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(
+                                          AppDimensions.radiusXLarge - 2),
+                                      color: AppColors.buttonTertiary),
+                                  width: AppDimensions.loadMoreButtonWidth,
+                                  height: AppDimensions.buttonHeightMedium,
                                   child: OutlinedButton(
                                     onPressed: viewModel.isLoadingMore
                                         ? null
                                         : () => viewModel.loadMore(),
-                                    style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(
-                                        color: AppColors.border,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
+                                    // style: OutlinedButton.styleFrom(
+                                    //   side: const BorderSide(
+                                    //     color: AppColors.border,
+                                    //   ),
+                                    //   shape: RoundedRectangleBorder(
+                                    //     borderRadius: BorderRadius.circular(
+                                    //         AppDimensions.radiusSmall),
+                                    //   ),
+                                    // ),
                                     child: viewModel.isLoadingMore
                                         ? const SizedBox(
-                                            width: 20,
-                                            height: 20,
+                                            width: AppDimensions
+                                                .loadMoreIndicatorSize,
+                                            height: AppDimensions
+                                                .loadMoreIndicatorSize,
                                             child: CircularProgressIndicator(
-                                              strokeWidth: 2,
+                                              strokeWidth:
+                                                  AppDimensions.borderThick,
                                               valueColor:
                                                   AlwaysStoppedAnimation<Color>(
-                                                Color(0xFF10B981),
+                                                AppColors.accent,
                                               ),
                                             ),
                                           )
-                                        : Text(
-                                            'Show more',
-                                            style: AppTypography.button.copyWith(
+                                        : AppText(
+                                            AppStrings.showMore,
+                                            style:
+                                                AppTypography.button.copyWith(
                                               color: AppColors.textSecondary,
+                                              fontWeight: FontWeight.w700,
+                                              fontSize:
+                                                  AppTypography.fontSize16,
                                             ),
                                           ),
                                   ),

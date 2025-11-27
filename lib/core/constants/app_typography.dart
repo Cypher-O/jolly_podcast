@@ -23,6 +23,7 @@ class AppTypography {
   static const double fontSize18 = 18.0;
   static const double fontSize20 = 20.0;
   static const double fontSize24 = 24.0;
+  static const double fontSize28 = 28.0;
   static const double fontSize32 = 32.0;
   static const double fontSize48 = 48.0;
 
@@ -32,6 +33,8 @@ class AppTypography {
   static const FontWeight weightMedium = FontWeight.w500;
   static const FontWeight weightSemiBold = FontWeight.w600;
   static const FontWeight weightBold = FontWeight.w700;
+  static const FontWeight weightExtraBold = FontWeight.w800;
+  static const FontWeight weightBlack = FontWeight.w900;
 
   // Letter spacing
   static const double letterSpacingTight = -0.5;

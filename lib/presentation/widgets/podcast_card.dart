@@ -1,9 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:jolly_podcast/core/constants/app_assets.dart';
 import 'package:jolly_podcast/core/constants/app_colors.dart';
 import 'package:jolly_podcast/core/constants/app_dimensions.dart';
+import 'package:jolly_podcast/core/constants/app_strings.dart';
 import 'package:jolly_podcast/core/constants/app_typography.dart';
 import 'package:jolly_podcast/domain/entities/podcast.dart';
+import 'package:jolly_podcast/presentation/widgets/app_text.dart';
 
 /// {@template podcast_card}
 /// A card widget that displays podcast information.
@@ -29,11 +32,11 @@ class PodcastCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.surfaceDark,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,9 +52,9 @@ class PodcastCard extends StatelessWidget {
                         color: AppColors.surfaceDark,
                         child: const Center(
                           child: CircularProgressIndicator(
-                            strokeWidth: 2,
+                            strokeWidth: AppDimensions.borderThick,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0xFF10B981),
+                              AppColors.accent,
                             ),
                           ),
                         ),
@@ -60,7 +63,7 @@ class PodcastCard extends StatelessWidget {
                         color: AppColors.surfaceDark,
                         child: const Icon(
                           Icons.podcasts,
-                          size: 48,
+                          size: AppDimensions.iconXLarge,
                           color: AppColors.textTertiary,
                         ),
                       ),
@@ -69,91 +72,98 @@ class PodcastCard extends StatelessWidget {
                       color: AppColors.surfaceDark,
                       child: const Icon(
                         Icons.podcasts,
-                        size: 48,
+                        size: AppDimensions.iconXLarge,
                         color: AppColors.textTertiary,
                       ),
                     ),
             ),
             // Podcast Info Section
             Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppDimensions.spacing8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Title
-                  Text(
+                  AppText(
                     podcast.title,
                     style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
-                      fontSize: 12,
+                      fontSize: AppDimensions.fontLarge,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppDimensions.borderThick),
                   // Author - Use publisher name
-                  Text(
+                  AppText(
                     podcast.publisherName ?? podcast.author,
                     style: AppTypography.caption.copyWith(
+                      fontWeight: FontWeight.w500,
                       color: AppColors.textSecondary,
-                      fontSize: 10,
+                      fontSize: AppDimensions.fontMedium13,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacing12),
                   // Follow button and Share icon row
                   Row(
                     children: [
                       // Follow Button with plus icon - grey background, white content
-                      Expanded(
-                        child: Container(
-                          height: 28,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF374151),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                'assets/images/add.png',
-                                width: 12,
-                                height: 12,
-                                fit: BoxFit.contain,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Follow',
-                                style: AppTypography.caption.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ],
+                      Container(
+                        height: AppDimensions.buttonHeightXS30,
+                        width: AppDimensions.containerWidth78,
+                        decoration: BoxDecoration(
+                          color: AppColors.buttonTertiary,
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusLarge + 2,
                           ),
                         ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              AppAssets.addIcon,
+                              width: AppDimensions.iconSmall18,
+                              height: AppDimensions.iconSmall18,
+                              fit: BoxFit.contain,
+                              color: AppColors.textPrimary,
+                            ),
+                            const SizedBox(width: AppDimensions.spacing4),
+                            AppText(
+                              AppStrings.follow,
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w700,
+                                fontSize: AppDimensions.fontMedium13,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(
+                          width: AppDimensions.buttonPaddingVertical6),
                       // Share Icon Button - circular, separate
                       Container(
-                        width: 28,
-                        height: 28,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF374151),
+                        width: AppDimensions.buttonHeightXSmall,
+                        height: AppDimensions.buttonHeightXSmall,
+                        decoration: BoxDecoration(
+                          color: AppColors.transparent,
                           shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.textPrimary,
+                            width: AppDimensions.borderThin,
+                          ),
                         ),
                         child: Center(
                           child: Image.asset(
-                            'assets/images/share.png',
-                            width: 12,
-                            height: 12,
+                            AppAssets.shareIcon,
+                            width: AppDimensions.iconTiny,
+                            height: AppDimensions.iconTiny,
                             fit: BoxFit.contain,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),

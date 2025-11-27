@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:jolly_podcast/core/constants/app_colors.dart';
 import 'package:jolly_podcast/core/constants/app_dimensions.dart';
 import 'package:jolly_podcast/core/constants/app_typography.dart';
+import 'package:jolly_podcast/presentation/widgets/app_text.dart';
+import 'package:jolly_podcast/presentation/widgets/button_variant.dart';
 
 /// {@template custom_button}
 /// A customizable button widget used throughout the application.
@@ -68,17 +70,11 @@ class CustomButton extends StatelessWidget {
                   ),
                 ),
               )
-            : Text(
+            : AppText(
                 text,
                 style: AppTypography.button,
               ),
       ),
     );
   }
-}
-
-/// Button variant types
-enum ButtonVariant {
-  primary,
-  secondary,
 }

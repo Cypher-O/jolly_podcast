@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jolly_podcast/core/constants/app_assets.dart';
 import 'package:jolly_podcast/core/constants/app_colors.dart';
 import 'package:jolly_podcast/core/constants/app_dimensions.dart';
+import 'package:jolly_podcast/core/constants/app_strings.dart';
 import 'package:jolly_podcast/core/constants/app_typography.dart';
 import 'package:jolly_podcast/presentation/viewmodels/login_viewmodel.dart';
 import 'package:jolly_podcast/presentation/views/podcast_list/podcast_list_view.dart';
+import 'package:jolly_podcast/presentation/widgets/app_text.dart';
 
 /// {@template login_view}
 /// Login screen for the Jolly Podcast application.
@@ -63,7 +66,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
           // Background image - Full screen
           Positioned.fill(
             child: Image.asset(
-              'assets/images/login_bg.png',
+              AppAssets.loginBackground,
               fit: BoxFit.cover,
               alignment: Alignment.center,
             ),
@@ -76,8 +79,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.4),
-                    Colors.black.withOpacity(0.7),
+                    AppColors.textOnPrimary.withOpacity(0.4),
+                    AppColors.textOnPrimary.withOpacity(0.7),
                   ],
                 ),
               ),
@@ -94,40 +97,42 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   ),
                   child: Column(
                     children: [
-                      const Spacer(flex: 2),
+                      const Spacer(flex: 6),
                       // Jolly Logo
                       Image.asset(
-                        'assets/images/jolly_logo_login.png',
-                        width: 180,
-                        height: 80,
+                        AppAssets.jollyLogoLogin,
+                        width: AppDimensions.loginLogoWidth,
+                        height: AppDimensions.loginLogoHeight,
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(height: AppDimensions.spacing16),
                       // Tagline
-                      Text(
-                        'PODCASTS FOR',
-                        style: AppTypography.h3.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.2,
-                        ),
+                      const AppText(
+                        AppStrings.podcastsFor,
+                        style: AppTypography.h3,
+                        fontSize: AppTypography.fontSize28,
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
                         textAlign: TextAlign.center,
                       ),
-                      Text(
-                        'AFRICA, BY AFRICANS',
-                        style: AppTypography.h3.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.2,
-                        ),
+                      const AppText(
+                        AppStrings.africaByAfricans,
+                        style: AppTypography.h3,
+                        fontSize: AppTypography.fontSize28,
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
                         textAlign: TextAlign.center,
                       ),
-                      const Spacer(flex: 1),
+                      // const Spacer(flex: 1),
+                      const SizedBox(height: AppDimensions.spacing32),
                       // Phone input
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+                          color: AppColors.textPrimary,
+                          borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusXXLarge),
                         ),
                         child: TextField(
                           controller: _phoneController,
@@ -136,25 +141,26 @@ class _LoginViewState extends ConsumerState<LoginView> {
                             color: Colors.black87,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Enter your phone number',
+                            hintText: AppStrings.phoneNumberHint,
                             hintStyle: AppTypography.bodyLarge.copyWith(
                               color: Colors.grey,
                             ),
                             prefixIcon: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: AppDimensions.spacing12),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Image.asset(
-                                    'assets/images/nigeria_flag.png',
-                                    width: 24,
-                                    height: 24,
+                                    AppAssets.nigeriaFlag,
+                                    width: AppDimensions.iconMedium,
+                                    height: AppDimensions.iconMedium,
                                     fit: BoxFit.contain,
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: AppDimensions.spacing8),
                                   Container(
-                                    height: 24,
-                                    width: 1,
+                                    height: AppDimensions.iconMedium,
+                                    width: AppDimensions.separatorHeight,
                                     color: Colors.grey.shade300,
                                   ),
                                 ],
@@ -175,8 +181,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       // Password input
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+                          color: AppColors.textPrimary,
+                          borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusXXLarge),
                         ),
                         child: TextField(
                           controller: _passwordController,
@@ -185,7 +192,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                             color: Colors.black87,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Enter your password',
+                            hintText: AppStrings.passwordHint,
                             hintStyle: AppTypography.bodyLarge.copyWith(
                               color: Colors.grey,
                             ),
@@ -212,42 +219,41 @@ class _LoginViewState extends ConsumerState<LoginView> {
                         child: ElevatedButton(
                           onPressed: viewModel.isLoading ? null : _handleLogin,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0D5241),
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor: const Color(0xFF0D5241),
-                            disabledForegroundColor: Colors.white,
+                            backgroundColor: AppColors.buttonDark,
+                            foregroundColor: AppColors.textPrimary,
+                            disabledBackgroundColor: AppColors.buttonDark,
+                            disabledForegroundColor: AppColors.textPrimary,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                              borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusButtonLarge),
                             ),
                             elevation: 0,
                           ),
                           child: viewModel.isLoading
                               ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
+                                  height: AppDimensions.loadMoreIndicatorSize,
+                                  width: AppDimensions.loadMoreIndicatorSize,
                                   child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
+                                    strokeWidth: AppDimensions.borderThick25,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
+                                      AppColors.textPrimary,
                                     ),
                                   ),
                                 )
-                              : Text(
-                                  'Continue',
-                                  style: AppTypography.button.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              : const AppText(
+                                  AppStrings.loginButton,
+                                  style: AppTypography.button,
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w600,
                                 ),
                         ),
                       ),
                       if (viewModel.errorMessage != null) ...[
                         const SizedBox(height: AppDimensions.spacing12),
-                        Text(
+                        AppText(
                           viewModel.errorMessage!,
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.error,
-                          ),
+                          style: AppTypography.bodyMedium,
+                          color: AppColors.error,
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -260,12 +266,23 @@ class _LoginViewState extends ConsumerState<LoginView> {
                             color: AppColors.textSecondary,
                           ),
                           children: const [
-                            TextSpan(text: 'By proceeding, you agree and accept our '),
                             TextSpan(
-                              text: 'T&C',
+                              text: AppStrings.termsAndConditions,
                               style: TextStyle(
+                                fontFamily: 'FuturaPT',
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w400,
+                                fontSize: AppTypography.fontSize16,
+                              ),
+                            ),
+                            TextSpan(
+                              text: AppStrings.tAndCAbbreviation,
+                              style: TextStyle(
+                                fontFamily: 'FuturaPT',
                                 decoration: TextDecoration.underline,
-                                color: AppColors.primary,
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w400,
+                                fontSize: AppTypography.fontSize16,
                               ),
                             ),
                           ],
@@ -273,13 +290,13 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       ),
                       const SizedBox(height: AppDimensions.spacing24),
                       // Become a Creator
-                      Text(
-                        'BECOME A PODCAST CREATOR',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
+                      const AppText(
+                        AppStrings.becomeCreator,
+                        style: AppTypography.bodyMedium,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'FuturaPT',
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
                       ),
                       const Spacer(flex: 1),
                     ],

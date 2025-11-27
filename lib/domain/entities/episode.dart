@@ -1,3 +1,4 @@
+import 'package:jolly_podcast/core/constants/app_strings.dart';
 import 'package:jolly_podcast/data/models/episode_dto.dart';
 
 /// {@template episode}
@@ -81,6 +82,31 @@ class Episode {
       return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
     } else {
       return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    }
+  }
+
+  /// Formats the published date in a human-readable relative format
+  String get formattedPublishedDate {
+    if (publishedAt == null) return '';
+
+    final now = DateTime.now();
+    final difference = now.difference(publishedAt!);
+
+    if (difference.inDays == 0) {
+      return AppStrings.today;
+    } else if (difference.inDays == 1) {
+      return AppStrings.yesterday;
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    } else if (difference.inDays < 30) {
+      final weeks = (difference.inDays / 7).floor();
+      return '$weeks ${weeks == 1 ? 'week' : 'weeks'} ago';
+    } else if (difference.inDays < 365) {
+      final months = (difference.inDays / 30).floor();
+      return '$months ${months == 1 ? 'month' : 'months'} ago';
+    } else {
+      final years = (difference.inDays / 365).floor();
+      return '$years ${years == 1 ? 'year' : 'years'} ago';
     }
   }
 }

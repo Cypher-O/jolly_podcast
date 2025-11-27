@@ -3,6 +3,7 @@ import 'package:jolly_podcast/core/constants/api_constants.dart';
 import 'package:jolly_podcast/core/network/api_interceptor.dart';
 import 'package:jolly_podcast/core/network/network_exceptions.dart';
 import 'package:jolly_podcast/core/security/secure_storage_service.dart';
+import 'package:jolly_podcast/core/services/authentication_service.dart';
 import 'package:jolly_podcast/core/utils/logger_service.dart';
 
 /// {@template dio_client}
@@ -19,6 +20,7 @@ class DioClient {
   DioClient(
     SecureStorageService secureStorage,
     LoggerService logger,
+    AuthenticationService authenticationService,
   ) {
     _dio = Dio(
       BaseOptions(
@@ -37,7 +39,9 @@ class DioClient {
     );
 
     // Add interceptors
-    _dio.interceptors.add(ApiInterceptor(secureStorage, logger));
+    _dio.interceptors.add(
+      ApiInterceptor(secureStorage, logger, authenticationService),
+    );
   }
 
   late final Dio _dio;

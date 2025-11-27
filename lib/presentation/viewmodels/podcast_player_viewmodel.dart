@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +29,7 @@ class PodcastPlayerViewModel extends ChangeNotifier {
   final String podcastId;
 
   late AudioPlayer _audioPlayer;
+  final List<StreamSubscription> _subscriptions = [];
 
   // State
   Podcast? _podcast;
@@ -64,31 +67,64 @@ class PodcastPlayerViewModel extends ChangeNotifier {
   String get formattedCurrentPosition => _formatDuration(_currentPosition);
   String get formattedTotalDuration => _formatDuration(_totalDuration);
 
+  String get statsText {
+    final parts = <String>[];
+
+    // Add episode count
+    final episodeCount = _episodes.length;
+    if (episodeCount > 0) {
+      parts.add('$episodeCount ${episodeCount == 1 ? 'Episode' : 'Episodes'}');
+    }
+
+    // Add subscriber count if available
+    final subscriberCount = _podcast?.subscriberCount ?? 0;
+    parts.add(
+        '$subscriberCount ${subscriberCount == 1 ? 'Subscriber' : 'Subscribers'}');
+
+    return parts.join(' ');
+  }
+
   // Methods
   void _setupAudioListeners() {
-    _audioPlayer.onPlayerStateChanged.listen((state) {
-      _isPlaying = state == PlayerState.playing;
-      notifyListeners();
-    });
+    _subscriptions.add(
+      _audioPlayer.onPlayerStateChanged.listen((state) {
+        _isPlaying = state == PlayerState.playing;
+        notifyListeners();
+      }),
+    );
 
-    _audioPlayer.onDurationChanged.listen((duration) {
-      _totalDuration = duration;
-      notifyListeners();
-    });
+    _subscriptions.add(
+      _audioPlayer.onDurationChanged.listen((duration) {
+        _totalDuration = duration;
+        notifyListeners();
+      }),
+    );
 
-    _audioPlayer.onPositionChanged.listen((position) {
-      _currentPosition = position;
-      notifyListeners();
-    });
+    _subscriptions.add(
+      _audioPlayer.onPositionChanged.listen((position) {
+        _currentPosition = position;
+        notifyListeners();
+      }),
+    );
 
-    _audioPlayer.onPlayerComplete.listen((_) async {
-      _isPlaying = false;
-      _currentPosition = Duration.zero;
-      notifyListeners();
+    _subscriptions.add(
+      _audioPlayer.onPlayerComplete.listen((_) async {
+        _isPlaying = false;
+        _currentPosition = Duration.zero;
+        notifyListeners();
 
-      // Automatically play next episode if available
-      await _playNextEpisodeIfAvailable();
-    });
+        // Automatically play next episode if available
+        await _playNextEpisodeIfAvailable();
+      }),
+    );
+  }
+
+  /// Set initial podcast data (e.g., from list view)
+  void setInitialPodcast(Podcast podcast) {
+    if (_podcast == null) {
+      _podcast = podcast;
+      notifyListeners();
+    }
   }
 
   Future<void> loadPodcastDetails() async {
@@ -98,7 +134,35 @@ class PodcastPlayerViewModel extends ChangeNotifier {
 
     try {
       final podcastRepository = _ref.read(podcastRepositoryProvider);
-      _podcast = await podcastRepository.getPodcastDetails(podcastId);
+      final fetchedPodcast =
+          await podcastRepository.getPodcastDetails(podcastId);
+
+      // Preserve subscriber count from initial podcast if API doesn't return it
+      if (_podcast != null &&
+          (fetchedPodcast.subscriberCount == null ||
+              fetchedPodcast.subscriberCount == 0) &&
+          _podcast!.subscriberCount != null) {
+        _podcast = Podcast(
+          id: fetchedPodcast.id,
+          userId: fetchedPodcast.userId,
+          title: fetchedPodcast.title,
+          author: fetchedPodcast.author,
+          categoryName: fetchedPodcast.categoryName,
+          categoryType: fetchedPodcast.categoryType,
+          pictureUrl: fetchedPodcast.pictureUrl,
+          coverPictureUrl: fetchedPodcast.coverPictureUrl,
+          description: fetchedPodcast.description,
+          subscriberCount:
+              _podcast!.subscriberCount, // Use count from list view
+          publisherName: fetchedPodcast.publisherName,
+          publisherCompany: fetchedPodcast.publisherCompany,
+          createdAt: fetchedPodcast.createdAt,
+          updatedAt: fetchedPodcast.updatedAt,
+        );
+      } else {
+        _podcast = fetchedPodcast;
+      }
+
       _isLoadingPodcast = false;
       notifyListeners();
 
@@ -129,7 +193,8 @@ class PodcastPlayerViewModel extends ChangeNotifier {
 
       // If podcast is null, use the method that extracts podcast data from episodes
       if (_podcast == null) {
-        final result = await podcastRepository.getPodcastEpisodesWithPodcastData(podcastId);
+        final result = await podcastRepository
+            .getPodcastEpisodesWithPodcastData(podcastId);
         _episodes = result['episodes'] as List<Episode>;
         _podcast = result['podcast'] as Podcast?;
       } else {
@@ -225,7 +290,8 @@ class PodcastPlayerViewModel extends ChangeNotifier {
   Future<void> playNextEpisode() async {
     if (_currentEpisode == null || _episodes.isEmpty) return;
 
-    final currentIndex = _episodes.indexWhere((e) => e.id == _currentEpisode!.id);
+    final currentIndex =
+        _episodes.indexWhere((e) => e.id == _currentEpisode!.id);
     if (currentIndex == -1 || currentIndex >= _episodes.length - 1) {
       // Already at last episode, do nothing or loop to first
       return;
@@ -238,7 +304,8 @@ class PodcastPlayerViewModel extends ChangeNotifier {
   Future<void> _playNextEpisodeIfAvailable() async {
     if (_currentEpisode == null || _episodes.isEmpty) return;
 
-    final currentIndex = _episodes.indexWhere((e) => e.id == _currentEpisode!.id);
+    final currentIndex =
+        _episodes.indexWhere((e) => e.id == _currentEpisode!.id);
     // Only auto-play next if there's another episode after this one
     if (currentIndex != -1 && currentIndex < _episodes.length - 1) {
       await selectEpisode(_episodes[currentIndex + 1]);
@@ -248,7 +315,8 @@ class PodcastPlayerViewModel extends ChangeNotifier {
   Future<void> playPreviousEpisode() async {
     if (_currentEpisode == null || _episodes.isEmpty) return;
 
-    final currentIndex = _episodes.indexWhere((e) => e.id == _currentEpisode!.id);
+    final currentIndex =
+        _episodes.indexWhere((e) => e.id == _currentEpisode!.id);
     if (currentIndex <= 0) {
       // Already at first episode, restart current episode
       await seek(Duration.zero);
@@ -284,13 +352,20 @@ class PodcastPlayerViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    // Cancel all stream subscriptions first to prevent callbacks after disposal
+    for (final subscription in _subscriptions) {
+      subscription.cancel();
+    }
+    _subscriptions.clear();
+
+    // Then dispose the audio player
     _audioPlayer.dispose();
     super.dispose();
   }
 }
 
 /// Provider for PodcastPlayerViewModel
-final podcastPlayerViewModelProvider = ChangeNotifierProvider.autoDispose
-    .family<PodcastPlayerViewModel, String>(
+final podcastPlayerViewModelProvider =
+    ChangeNotifierProvider.autoDispose.family<PodcastPlayerViewModel, String>(
   (ref, podcastId) => PodcastPlayerViewModel(ref, podcastId),
 );

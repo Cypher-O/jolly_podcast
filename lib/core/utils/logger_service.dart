@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:jolly_podcast/core/config/app_config.dart';
@@ -31,7 +30,7 @@ class LoggerService {
   void info(String message, [String? tag]) {
     if (_shouldLog) {
       final prefix = tag != null ? '[$tag]' : '[INFO]';
-      log('$prefix $message');
+      debugPrint('$prefix $message');
     }
   }
 
@@ -39,7 +38,7 @@ class LoggerService {
   void debug(String message, [String? tag]) {
     if (_shouldLog && kDebugMode) {
       final prefix = tag != null ? '[$tag]' : '[DEBUG]';
-      log('$prefix $message');
+      debugPrint('$prefix $message');
     }
   }
 
@@ -47,19 +46,19 @@ class LoggerService {
   void warning(String message, [String? tag]) {
     if (_shouldLog) {
       final prefix = tag != null ? '[$tag]' : '[WARNING]';
-      log('$prefix $message');
+      debugPrint('$prefix $message');
     }
   }
 
   /// Log errors
   void error(String message, [Object? error, StackTrace? stackTrace]) {
     if (_shouldLog) {
-      log('[ERROR] $message');
+      debugPrint('[ERROR] $message');
       if (error != null) {
-        log('Error details: $error');
+        debugPrint('Error details: $error');
       }
       if (stackTrace != null) {
-        log('Stack trace:\n$stackTrace');
+        debugPrint('Stack trace:\n$stackTrace');
       }
     }
   }
@@ -67,7 +66,7 @@ class LoggerService {
   /// Log network requests
   void logRequest(String method, String path) {
     if (_shouldLog) {
-      log('[REQUEST] $method => $path');
+      debugPrint('[REQUEST] $method => $path');
     }
   }
 
@@ -75,15 +74,15 @@ class LoggerService {
   void logResponse(int? statusCode, String path) {
     if (_shouldLog) {
       final statusPrefix = _getStatusPrefix(statusCode);
-      log('$statusPrefix [RESPONSE] [$statusCode] => $path');
+      debugPrint('$statusPrefix [RESPONSE] [$statusCode] => $path');
     }
   }
 
   /// Log network errors
   void logNetworkError(String path, Object error) {
     if (_shouldLog) {
-      log('[NETWORK ERROR] $path');
-      log('Error: $error');
+      debugPrint('[NETWORK ERROR] $path');
+      debugPrint('Error: $error');
     }
   }
 
